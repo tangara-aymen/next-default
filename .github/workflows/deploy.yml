@@ -20,23 +20,15 @@ jobs:
 
             cd /var/www/next-default
 
-            echo "▶ Update code"
             git fetch origin
             git reset --hard origin/main
             git clean -fd
 
-            echo "▶ Remove previous Next.js build (CRITICAL)"
-            rm -rf .next
+            # CRITICAL: prevent EACCES forever
+            rm -rf .next node_modules
 
-            echo "▶ Install dependencies"
             npm ci --no-audit --no-fund
-
-            echo "▶ Build application"
             npm run build
 
-            echo "▶ Restart app"
-            pm2 describe next-default >/dev/null \
-              && pm2 restart next-default \
-              || pm2 start npm --name "next-default" -- start
-
+            pm2 start npm --name "next-default" -- start || pm2 restart next-default
             pm2 save
