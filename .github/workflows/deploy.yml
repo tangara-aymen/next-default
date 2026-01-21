@@ -1,46 +1,23 @@
 name: Deploy to Ubuntu
-
 on:
   push:
     branches: [ main ]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -e
-
             cd /var/www/next-default
-
-            echo "▶ Fetch latest code"
             git fetch origin
             git reset --hard origin/main
-            git clean -fdx
-
-            echo "▶ Ensure correct Node version"
-            node -v
-            npm -v
-
-            echo "▶ Clean previous build artifacts"
-            rm -rf .next
-
-            echo "▶ Install dependencies"
-            npm ci --no-audit --no-fund
-
-            echo "▶ Build Next.js"
+            git clean -fd
+            npm ci
             npm run build
-
-            echo "▶ Restart application"
-            pm2 describe next-default >/dev/null \
-              && pm2 restart next-default \
-              || pm2 start npm --name "next-default" -- start
-
+            pm2 restart next-default || pm2 start npm --name "next-default" -- start
             pm2 save
