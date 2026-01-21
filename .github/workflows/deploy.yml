@@ -7,7 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
@@ -24,11 +23,10 @@ jobs:
             git reset --hard origin/main
             git clean -fd
 
-            # CRITICAL: prevent EACCES forever
             rm -rf .next node_modules
 
             npm ci --no-audit --no-fund
             npm run build
 
-            pm2 start npm --name "next-default" -- start || pm2 restart next-default
+            pm2 restart next-default || pm2 start npm --name next-default -- start
             pm2 save
