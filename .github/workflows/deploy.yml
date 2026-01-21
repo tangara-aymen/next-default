@@ -16,8 +16,8 @@ jobs:
         username: deploy
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /var/www/nextjs-app
+          cd /var/www/next-default
           git pull origin main
           npm install
           npm run build
-          pm2 restart nextjs-app
+          pm2 restart next-default
