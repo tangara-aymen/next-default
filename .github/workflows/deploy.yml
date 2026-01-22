@@ -23,8 +23,8 @@ jobs:
             git reset --hard origin/main
             git clean -fd
 
-            sudo rm -rf .next node_modules
-            sudo chown -R deploy:deploy /var/www/next-default
+            rm -rf .next node_modules
+
             npm ci --no-audit --no-fund
             npm run build
 
